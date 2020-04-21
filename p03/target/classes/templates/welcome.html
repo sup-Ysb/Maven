@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>购物车</title>
+    <!--rel 属性指示被链接的文档是一个样式表,说白了就是指明你链进来的对象是个什么-->
+    <link href="bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+</head>
+<body>
+  <!--
+    container布局容器
+    Bootstrap 需要为页面内容和栅格系统包裹一个 .container 容器。提供了两个作此用处的类。注意，由于 padding 等属性的原因，这两种 容器类不能互相嵌套。
+    1、container 类用于固定宽度并支持响应式布局的容器。2、.container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。
+    -->
+    <h1>Welcome to our web site ...</h1>
+	<h3>Shopping!</h3>
+    <div id="app" class="container">
+        <h1>购物车</h1>
+        <hr>
+        <btn-grp></btn-grp>
+        <br>
+        <br>
+        <table class="table table-bordered table-striped table-hover">
+            <tr>
+              <th>ID</th>
+              <th>商品名称</th>
+              <th>商品价格</th>
+              <th>商品数量</th>
+              <th>商品总价</th>
+            </tr>
+            <tr v-for="(product,index) in products">
+              <td>{{index+1}}</td>
+              <td>{{product.name}}</td>
+              <td>{{product.price}}</td>
+              <td>
+                 <!--可以将两个按钮的方法合成一个，通过传参-->
+                <!--<button @click="changeCount(prod, -1)">-</button>-->
+                <button @click="cutCount(product)" class="btn btn-default btn-sm">-</button>
+                <input type="number" v-model="product.count"/>
+                <!--<button @click="changeCount(prod, 1)">-</button>-->
+                <button @click="addCount(product)" class="btn btn-default btn-sm">+</button>
+              </td>
+              <td>{{product.price * product.count}}</td>
+            </tr>
+            <tr>
+              <!--text-right排版文本右对齐-->
+              <td colspan="4" class="text-right">总价:</td>
+              <!--text-primary辅助类文本-->
+              <td class="text-primary">{{totalMoney}}</td>
+              <!--方法调用：<td class="text-primary">{{getTotalMoney()}}</td>-->
+            </tr>
+        </table>
+    </div>
+    <script type="application/javascript" src="vue-2.6.9.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.2/axios.min.js"></script>
+    <script type="application/javascript">
+        Vue.component('btn-grp',{
+          props:['button'],
+          //btn-group：基本的按钮组。在 .btn-group 中放置一系列带有 class .btn 的按钮。
+          //  role="group"按钮组合
+          template:`
+                  <div class="btn-group" role="group">
+                    <button type="button"
+                        v-for="button in buttons"
+                        v-bind:class="\'btn \'+button.class"
+                        v-on:click="button.handler"
+                    >{{button.title}}</button>
+                  </div>
+          `,
+          data:function(){
+            return{
+              buttons:[
+                {title:'添加',class:'btn-primary',handler:function(){alert('点击添加按钮')}},
+                {title:'修改',class:'btn-default',handler:function(){alert('点击修改按钮')}},
+                {title:'删除',class:'btn-default',handler:function(){alert('点击删除按钮')}}
+              ]
+            }
+          }
+        })
+        var app = new Vue({
+          el:'#app',
+          data:{
+            products: [
+              {
+                name: '小米6S',
+                price: 3999,
+                count: 1,
+              },
+              {
+                name: '锤子2',
+                price: 4999,
+                count: 1,
+              },
+              {
+                name: '华为P20',
+                price: 3599,
+                count: 1,
+              },
+              {
+                name: 'OPPO R15',
+                price: 2999,
+                count: 1,
+              },
+              {
+                name: 'OPPO R11',
+                price: 1999,
+                count: 1,
+              },
+            ],
+          },
+          methods:{
+            // 用户点击加减数量时调用
+            cutCount:function(product){
+                if(product.count>0){
+                  product.count--
+                }
+            },
+            addCount:function(product){
+                product.count++
+            }
+            /*
+             用户点击加减数量时调用通过传参合并为一个函数
+             changeCount: function(prod, num) {
+               if(num < 0) {
+                 if(prod.count > 0) {
+                  prod.count += num;
+                 }
+               }
+               else {
+                prod.count += num;
+               }
+             },
+            */
+            /*获取总价除了计算属性也可以用方法
+             getTotalMoney: function() {
+              var totalMoney = 0.0;
+               for(var i = 0; i < this.products.length; ++i) {
+                totalMoney += parseFloat(this.products[i].price * this.products[i].count);
+               }
+               return totalMoney;
+             }
+            */
+          },
+          computed:{
+            totalMoney:function(){
+              var price = 0;
+              for(var i = 0; i < this.products.length; ++i) {
+                price += parseFloat(this.products[i].price * this.products[i].count);
+              }
+              return price;
+            }
+          }
+        })
+    </script>
+</body>
+</html>
